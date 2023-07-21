@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact Details</title>
+  <style>
+    body {
+      background-color: #E0EAFF;
+    }
+    .navbar {
+      background-color: #E0EAFF;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 50px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .sub-navbar {
+      background-color: #C0C0C0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 50px;
+    }
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .edit-form label {
+      font-weight: bold;
+    }
+    .edit-form input,
+    .edit-form textarea {
+      margin-bottom: 10px;
+      width: 250px;
+    }
+    .contact-details {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">AlfaSoft</div>
+  <div class="sub-navbar">
+    <a href="/">Back Home</a>
+    <a href="/allContacts">All Contacts</a>
+    <a href="/addNew">Add New</a>
+  </div>
+  <h1>Contact Details</h1>
+  <div class="contact-details" id="contactDetails"></div>
+
+  <div class="edit-form" id="editForm" style="display: none;">
+    <label for="editFirstName">First Name:</label>
+    <input type="text" id="editFirstName">
+
+    <label for="editSecondName">Second Name:</label>
+    <input type="text" id="editSecondName">
+
+    <label for="editMail">Mail:</label>
+    <input type="text" id="editMail">
+
+    <label for="editPhoneNumber">Phone Number:</label>
+    <input type="text" id="editPhoneNumber">
+
+    <button onclick="saveChanges()">Save Changes</button>
+    <button onclick="deleteContact()">Delete</button>
+  </div>
+
+  <script>
+    let currentContact;
+
+    const displayContactDetails = (contact) => {
+      const contactDetails = document.getElementById("contactDetails");
+      contactDetails.innerHTML = "";
+
+      const img = document.createElement("img");
+      img.src = `data:image/png;base64,${contact.photo}`;
+      img.alt = `${contact.firstName} ${contact.secondName}`;
+      img.style.maxWidth = "200px";
+
+      const nameElement = document.createElement("h2");
+      nameElement.textContent = `${contact.firstName} ${contact.secondName}`;
+
+      const mailElement = document.createElement("p");
+      mailElement.textContent = `Mail: ${contact.mail}`;
+
+      const phoneNumberElement = document.createElement("p");
+      phoneNumberElement.textContent = `Phone Number: ${contact.phoneNumber}`;
+
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", () => {
+        showEditForm(contact);
+      });
+
+      contactDetails.appendChild(img);
+      contactDetails.appendChild(nameElement);
+      contactDetails.appendChild(mailElement);
+      contactDetails.appendChild(phoneNumberElement);
+      contactDetails.appendChild(editButton);
+    };
+
+    const showEditForm = (contact) => {
+      currentContact = contact;
+      const editForm = document.getElementById("editForm");
+      const editFirstName = document.getElementById("editFirstName");
+      const editSecondName = document.getElementById("editSecondName");
+      const editMail = document.getElementById("editMail");
+      const editPhoneNumber = document.getElementById("editPhoneNumber");
+
+      editFirstName.value = contact.firstName;
+      editSecondName.value = contact.secondName;
+      editMail.value = contact.mail;
+      editPhoneNumber.value = contact.phoneNumber;
+
+      editForm.style.display = "block";
+    };
+
+    const saveChanges = async () => {
+      const editedContact = {
+        ...currentContact,
+        firstName: document.getElementById("editFirstName").value,
+        secondName: document.getElementById("editSecondName").value,
+        mail: document.getElementById("editMail").value,
+        phoneNumber: document.getElementById("editPhoneNumber").value,
+      };
+
+      try {
+        const response = await fetch("https://u-topic-0-383623.uc.r.appspot.com/editContact", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editedContact),
+        });
+
+        if (response.ok) {
+          currentContact = editedContact;
+          displayContactDetails(editedContact);
+
+          const editForm = document.getElementById("editForm");
+          editForm.style.display = "none";
+        } else {
+          throw new Error("Failed to update contact.");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const deleteContact = async () => {
+      if (!currentContact) return; 
+
+      try {
+        const response = await fetch("https://u-topic-0-383623.uc.r.appspot.com/deleteContact", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ contactId: currentContact.contactId }), 
+        });
+
+        if (response.ok) {
+          window.location.href = "/allContacts";
+        } else {
+          throw new Error("Failed to delete contact.");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const getContactById = async (contactId) => {
+      try {
+        const response = await fetch(`https://u-topic-0-383623.uc.r.appspot.com/getContact?contactId=${contactId}`);
+        const contactData = await response.json();
+        if (Array.isArray(contactData) && contactData.length > 0) {
+          const contact = contactData[0];
+          displayContactDetails(contact);
+        } else {
+          const contactDetails = document.getElementById("contactDetails");
+          const errorMessageElement = document.createElement("p");
+          errorMessageElement.textContent = "Contact not found.";
+          contactDetails.appendChild(errorMessageElement);
+        }
+      } catch (error) {
+        const contactDetails = document.getElementById("contactDetails");
+        const errorMessageElement = document.createElement("p");
+        errorMessageElement.textContent = "Failed to fetch contact.";
+        contactDetails.appendChild(errorMessageElement);
+      }
+    };
+
+    const init = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const contactId = urlParams.get("contactId");
+      getContactById(contactId);
+    };
+
+    init();
+  </script>
+</body>
+</html>
+

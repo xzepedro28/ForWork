@@ -1,64 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>All Contacts</title>
-    <style>
-        body {
-            background-color: #E0EAFF;
-            text-align: center;
-        }
-        .navbar {
-            background-color: #E0EAFF;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 50px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .sub-navbar {
-            background-color: #C0C0C0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 50px;
-        }
-        .contact-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .contact-card {
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #000;
-            max-width: 200px;
-        }
-    </style>
+  <title>All Contacts</title>
+  <style>
+    
+    .navbar {
+      background-color: #E0EAFF;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 50px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .sub-navbar {
+      background-color: #C0C0C0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 50px;
+    }
+    body {
+      background-color: #E0EAFF;
+    }
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .contact {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .contact img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      margin-right: 10px;
+    }
+    .contact-details {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
 </head>
 <body>
-    <div class="navbar">AlfaSoft</div>
-    <div class="sub-navbar">
-        <a href="/">Back Home</a>
-        <a href="/allContacts">All Contacts</a>
-        <a href="/addNew">Add New</a>
-    </div>
-    <h1>All Contacts</h1>
-    <div class="contact-list" id="contactList">
-        <% if (typeof contacts !== 'undefined' && contacts.length > 0) { %>
-            <% contacts.forEach((contact) => { %>
-                <div class="contact-card">
-                    <img src="data:image/png;base64,<%= contact.photo %>" alt="<%= `${contact.firstName} ${contact.secondName}` %>" style="max-width: 100px;">
-                    <p><%= `${contact.firstName} ${contact.secondName}` %></p>
-                </div>
-            <% }); %>
-        <% } else { %>
-            <p>Awaiting for contacts, add one.</p>
-        <% } %>
-    </div>
 
-    <script>
-        // Remove the existing JavaScript code since it's already implemented in your index.mjs
-    </script>
+  <div class="navbar">AlfaSoft</div>
+  <div class="sub-navbar">
+    <a href="/">Back Home</a>
+    <a href="/allContacts">All Contacts</a>
+    <a href="/addNew">Add New</a>
+  </div>
+
+
+  <div class="content-wrapper">
+    <h1>All Contacts</h1>
+    <div>
+      <% contacts.forEach(contact => { %>
+        <div class="contact">
+          <% if (contact.photo) { %>
+            <% const photoUrl = contact.photo; %>
+            <div class="photo-container">
+              <img src="<%= photoUrl %>" alt="Contact Photo">
+            </div>
+          <% } %>
+          <div class="contact-details">
+            <p><strong>Name:</strong> <%= contact.firstName %> <%= contact.lastName %></p>
+            <p><strong>Email:</strong> <%= contact.mail %></p>
+            <p><strong>Phone:</strong> <%= contact.phoneNumber %></p>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
 </body>
 </html>
+

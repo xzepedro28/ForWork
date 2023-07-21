@@ -3,7 +3,7 @@ import { dirname } from 'path';
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
-const fetch = await import('node-fetch').then((module) => module.default);
+import fetch from 'node-fetch';
 
 const app = express();
 const PORT = 80;
@@ -24,12 +24,30 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-app.get('/allContacts', (req, res) => {
-  res.render('allContacts');
-});
-
 app.get('/addNew', (req, res) => {
   res.render('addNew');
+});
+
+app.get('/allContacts', async (req, res) => {
+  try {
+    const response = await fetch('https://u-topic-0-383623.uc.r.appspot.com/allContacts');
+    if (response.ok) {
+      const data = await response.json();
+      const contacts = data.contacts; 
+      if (Array.isArray(contacts)) {
+        res.render('allContacts', { contacts }); 
+      } else {
+        console.error('Error: The contacts data is not an array.');
+        res.status(500).send('An error occurred while processing your request.');
+      }
+    } else {
+      console.error(`Error: ${response.status} - ${response.statusText}`);
+      res.status(response.status).send(response.statusText);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('An error occurred while processing your request.');
+  }
 });
 
 app.post('/api/addContact', async (req, res) => {
@@ -55,20 +73,6 @@ app.post('/api/addContact', async (req, res) => {
     res.status(500).send('An error occurred while processing your request.');
   }
 });
-
-app.get('/allContacts', async (req, res) => {
-  console.log("ROTA ACEDIDA")
-  try {
-    const response = await fetch('https://u-topic-0-383623.uc.r.appspot.com/allContacts');
-    const contacts = await response.json();
-    console.log("CONTACTOS====>"+contacts);
-    res.render('allContacts', { contacts });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).send('Failed to fetch contacts.');
-  }
-});
-
 
 app.get('/contact/:contactId', (req, res) => {
   const contactId = req.params.contactId;

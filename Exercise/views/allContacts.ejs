@@ -3,7 +3,6 @@
 <head>
   <title>All Contacts</title>
   <style>
-    
     .navbar {
       background-color: #E0EAFF;
       display: flex;
@@ -33,10 +32,10 @@
       margin-bottom: 20px;
     }
     .contact img {
-      width: 100px;
-      height: 100px;
+      width: 125px;
+      height: 150px;
       object-fit: cover;
-      margin-right: 10px;
+      margin-right: 25px;
     }
     .contact-details {
       display: flex;
@@ -45,7 +44,6 @@
   </style>
 </head>
 <body>
-
   <div class="navbar">AlfaSoft</div>
   <div class="sub-navbar">
     <a href="/">Back Home</a>
@@ -59,10 +57,10 @@
     <div>
       <% contacts.forEach(contact => { %>
         <div class="contact">
-          <% if (contact.photo) { %>
-            <% const photoUrl = contact.photo; %>
+          <% if (contact.photo ) { %>
+            <% const base64String = contact.photo.toString('base64'); %>
             <div class="photo-container">
-              <img src="<%= photoUrl %>" alt="Contact Photo">
+              <img src="data:image/jpeg;base64,<%= base64String %>" alt="Contact Photo">
             </div>
           <% } %>
           <div class="contact-details">

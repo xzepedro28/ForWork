@@ -50,6 +50,20 @@ app.get('/allContacts', async (req, res) => {
   }
 });
 
+app.get('/api/contact-photo/:contactId', (req, res) => {
+  const contactId = req.params.contactId;
+  const contact = contactArray.find((contact) => contact.id === contactId);
+
+  if (!contact || !contact.photo) {
+    res.sendStatus(404);
+    return;
+  }
+
+  const base64String = Buffer.from(contact.photo, 'binary').toString('base64');
+  const dataUri = `data:image/jpeg;base64,${base64String}`;
+  res.send(dataUri);
+});
+
 app.post('/api/addContact', async (req, res) => {
   const requestBody = req.body;
 
